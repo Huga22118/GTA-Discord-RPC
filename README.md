@@ -15,9 +15,9 @@ Memory Addresses taken from [GTAMods](https://gtamods.com/wiki/Memory_Addresses_
 - GTA Vice City 1.0
 
 # Screenshots
-[iii](https://github.com/Huga22118/GTA-Discord-RPC/blob/main/iii.png)
-[sa](https://github.com/Huga22118/GTA-Discord-RPC/blob/main/sa.png)
-[vc](https://github.com/Huga22118/GTA-Discord-RPC/blob/main/vc.png)
+![iii](https://github.com/Huga22118/GTA-Discord-RPC/blob/main/iii.png)
+![sa](https://github.com/Huga22118/GTA-Discord-RPC/blob/main/sa.png)
+![vc](https://github.com/Huga22118/GTA-Discord-RPC/blob/main/vc.png)
 
 # Build
 - Assuming you have Visual Studio 2019.
