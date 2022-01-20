@@ -3,7 +3,7 @@ Discord RPC Plugins for GTA III/San Andreas/Vice City, Written in C++
 
 Based on [gtasa-discord-plugin](https://github.com/Brunoo16/gtasa-discord-plugin)
 
-Memory Addresses taken from [GTAMods](https://gtamods.com/wiki/Memory_Addresses_(VC)) and [Plugin-SDK](https://github.com/DK22Pac/plugin-sdk)
+Memory Addresses taken from [GTAMods](https://gtamods.com/wiki/Category:Memory_Addresses) and [Plugin-SDK](https://github.com/DK22Pac/plugin-sdk)
 
 # Requirements
 - [Visual Studio 2019](https://download.visualstudio.microsoft.com/download/pr/b763973d-da6e-4025-834d-d8bc48e7d37f/9b7780b6641ceb4e62c0578d59eb3dbebeda8f5a3474ed253316b0b004d2466e/vs_Community.exe).
