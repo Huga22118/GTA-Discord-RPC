@@ -64,7 +64,7 @@ void RPC()
 	HMODULE module = NULL;
 	rpc = new Game();
 
-	if (GetModuleHandle("SAMP.dll") || ("SAMP.asi"))
+	if (GetModuleHandleA("SAMP.dll") || GetModuleHandleA("SAMP.asi"))
 	{
 		FreeLibraryAndExitThread(module, 0);
 		MessageBox(RsGlobal.ps->window, "SA-MP are not compatible with this mod.", "Discord-RPC for GTA SA 1.0 Hoodlum", MB_ICONERROR);
