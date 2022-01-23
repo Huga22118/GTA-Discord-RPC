@@ -87,7 +87,7 @@ void RPC()
 				details = "Money: $" + std::to_string(rpc->PlayerMoneyValue());
 				state = "Time: " + rpc->PlayerTime();
 				smallImageText = weaponNames[rpc->PlayerCurrentWeapon()];
-				largeImageText = "GTA SA Discord RPC";
+				largeImageText = GetGameVersionName();
 
 
 				drp.largeImageKey = "game_icon";
@@ -136,7 +136,7 @@ void RPC()
 
 			state = "Weapon: " + weaponNames[rpc->PlayerCurrentWeapon()];
 
-			largeImageText = "GTA VC Discord RPC";
+			largeImageText = GetGameVersionName();
 
 			drp.largeImageKey = "game_icon";
 
@@ -174,7 +174,7 @@ void RPC()
 			details = "In-Game";
 			state = "Money: $" + std::to_string(rpc->PlayerMoneyValue());
 
-			largeImageText = "GTA III Discord RPC";
+			largeImageText = GetGameVersionName();
 
 			drp.largeImageKey = "icon";
 			drp.largeImageText = largeImageText.c_str();
@@ -188,7 +188,7 @@ void RPC()
 }
 #endif
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 {
 	switch (reason)
 	{
@@ -196,7 +196,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 	case DLL_PROCESS_ATTACH:
 	{
 
-		if (GetGameVersion() == BY_GAME(GAME_10US_HOODLUM, GAME_10EN, GAME_10EN))
+#ifdef GTA3
+		if (GetGameVersion() == GAME_10EN)
 		{
 
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
@@ -204,8 +205,35 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 		}
 		else
 		{
-			MessageBox(HWND_DESKTOP, "Unknown GTA Game Version. GTA " BY_GAME("SA 1.0 Hoodlum", "VC 1.0 English", "III 1.0 English") " is required in order to use this mod, other versions are not compatible", "Discord-RPC for GTA " BY_GAME("SA 1.0 Hoodlum", "VC 1.0 English", "III 1.0 English"), MB_ICONERROR);
+			MessageBox(HWND_DESKTOP, "Unknown GTA Game Version. GTA III 1.0 English is required in order to use this mod, other versions are not compatible", "Discord-RPC for GTA III 1.0 English", MB_ICONERROR);
 		}
+#endif
+
+#ifdef GTASA
+		if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT)
+		{
+
+			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
+
+		}
+		else
+		{
+			MessageBox(HWND_DESKTOP, "Unknown GTA Game Version. GTA SA 1.0 Hoodlum / Compact is required in order to use this mod, other versions are not compatible", "Discord-RPC for GTA SA 1.0 Hoodlum / Compact", MB_ICONERROR);
+		}
+#endif
+
+#ifdef GTAVC
+		if (GetGameVersion() == GAME_10EN)
+		{
+
+			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
+
+		}
+		else
+		{
+			MessageBox(HWND_DESKTOP, "Unknown GTA Game Version. GTA VC 1.0 English is required in order to use this mod, other versions are not compatible", "Discord-RPC for GTA VC 1.0 English", MB_ICONERROR);
+		}
+#endif 
 		break;
 	}
 
@@ -220,4 +248,4 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 	}
 
 	return TRUE;
-}
+}  

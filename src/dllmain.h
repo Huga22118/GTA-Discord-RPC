@@ -7,18 +7,6 @@
 #include <windows.h>
 
 #ifdef GTASA
-#define BY_GAME(sa, vc, iii) sa
-#endif
-
-#ifdef GTAVC
-#define BY_GAME(sa, vc, iii) vc
-#endif
-
-#ifdef GTA3
-#define BY_GAME(sa, vc, iii) iii
-#endif
-
-#ifdef GTASA
 static const char* APPLICATION_ID = "698510493282992139";
 #endif
 
