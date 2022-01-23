@@ -40,7 +40,10 @@ Skip step 3-6 if you have Plugin-SDK Installed.
 Sorry for Bad english :)
 
 # Release
-[v1.0](https://github.com/Huga22118/GTA-Discord-RPC/releases/tag/v1.0)
+-[v2.0](https://github.com/Huga22118/GTA-Discord-RPC/releases/tag/v2.0)
+-[v1.0](https://github.com/Huga22118/GTA-Discord-RPC/releases/tag/v1.0)
+
+The Latest Version is v2.0
 
 
 
