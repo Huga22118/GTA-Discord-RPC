@@ -1,5 +1,5 @@
-# GTA-Discord-RPC
-Discord RPC Plugins for GTA III/San Andreas/Vice City, Written in C++
+# GTA-Trilogy-Discord-RPC
+Discord RPC Plugins for GTA Trilogy (III, San Andreas, Vice City), Written in C++
 
 Based on [gtasa-discord-plugin](https://github.com/Brunoo16/gtasa-discord-plugin)
 
@@ -26,7 +26,7 @@ Memory Addresses taken from [GTAMods](https://gtamods.com/wiki/Category:Memory_A
 
 # Build
 - Assuming you have Visual Studio 2019.
-- Clone the repository with `git clone --recursive https://github.com/Huga22118/GTA-Discord-RPC.git`.
+- Clone the repository with `git clone --recursive https://github.com/Huga22118/GTA-Trilogy-Discord-RPC.git`.
 - Open `installer-launcher.exe` and Setup `Plugin-SDK Environtment Variable` in your plugin-sdk directory.
 - Install Plugin-SDK Template and Generate solution.
 - Open `plugin.sln`.
