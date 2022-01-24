@@ -4,6 +4,7 @@
 #include "discord-rpc.h"
 #include <string>
 #include <ctime>
+#include <iostream>
 #include <windows.h>
 
 #ifdef GTASA
@@ -17,6 +18,21 @@ static const char* APPLICATION_ID = "929277207736643584";
 #ifdef GTA3
 static const char* APPLICATION_ID = "928498189236068393";
 #endif
+
+#ifdef GTAVC
+#define GAME "VC"
+#endif
+
+#ifdef GTA3
+#define GAME "III"
+#endif
+
+#ifdef GTASA
+#define GAME "SA"
+#endif
+
+static std::ofstream LOGGING = std::ofstream("Discord_" GAME ".log");
+
 
 class Game
 {

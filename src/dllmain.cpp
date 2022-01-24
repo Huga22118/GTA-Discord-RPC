@@ -68,6 +68,7 @@ void RPC()
 	{
 		FreeLibraryAndExitThread(module, 0);
 		MessageBox(RsGlobal.ps->window, "SA-MP are not compatible with this mod.", "Discord-RPC for GTA SA 1.0 Hoodlum", MB_ICONERROR);
+		LOGGING << "Error: SA-MP are not compatible with this mod." << std::endl;
 	}
 	else
 	{
@@ -78,6 +79,8 @@ void RPC()
 		drp = { 0 };
 		drp.startTimestamp = time(0);
 		Discord_Initialize(APPLICATION_ID, 0, 0, 0);
+
+		LOGGING << "Success: Discord Module initialized." << std::endl;
 
 		while (1)
 		{
@@ -120,6 +123,8 @@ void RPC()
 	drp = { 0 };
 	drp.startTimestamp = time(0);
 	Discord_Initialize(APPLICATION_ID, 0, 0, 0);
+
+	LOGGING << "Success: Discord Module initialized." << std::endl;
 
 	while (1)
 	{
@@ -166,6 +171,8 @@ void RPC()
 	drp.startTimestamp = time(0);
 	Discord_Initialize(APPLICATION_ID, 0, 0, 0);
 
+	LOGGING << "Success: Discord Module initialized." << std::endl;
+
 	while (1)
 	{
 		if (rpc->PlayerPointer())
@@ -201,11 +208,14 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 		{
 
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
+			LOGGING << "Success: " << GetGameVersionName() << " is compatible with this mod, now waiting for Discord Module initialized." << std::endl;
 
 		}
 		else
 		{
-			MessageBox(HWND_DESKTOP, "Unknown GTA Game Version. GTA III 1.0 English is required in order to use this mod, other versions are not compatible", "Discord-RPC for GTA III 1.0 English", MB_ICONERROR);
+			Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s",
+				plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10EN));
+			LOGGING << "Error: " << GetGameVersionName() << " is not compatible with this mod, these are supported version:\n" << GetGameVersionName(GAME_10EN) << "\nDiscord Module won't initialized." << std::endl;
 		}
 #endif
 
@@ -214,11 +224,14 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 		{
 
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
+			LOGGING << "Success: " << GetGameVersionName() << " is compatible with this mod, now waiting for Discord Module initialized." << std::endl;
 
 		}
 		else
 		{
-			MessageBox(HWND_DESKTOP, "Unknown GTA Game Version. GTA SA 1.0 Hoodlum / Compact is required in order to use this mod, other versions are not compatible", "Discord-RPC for GTA SA 1.0 Hoodlum / Compact", MB_ICONERROR);
+			Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s \n- %s",
+				plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT));
+			LOGGING << "Error: " << GetGameVersionName() << " is not compatible with this mod, these are supported version:\n" << GetGameVersionName(GAME_10US_HOODLUM) << " & " << GetGameVersionName(GAME_10US_COMPACT) << "\nDiscord Module won't initialized." << std::endl;
 		}
 #endif
 
@@ -227,11 +240,15 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 		{
 
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
+			LOGGING << "Success: " << GetGameVersionName() << " is compatible with this mod, now waiting for Discord Module initialized." << std::endl;
 
 		}
 		else
 		{
-			MessageBox(HWND_DESKTOP, "Unknown GTA Game Version. GTA VC 1.0 English is required in order to use this mod, other versions are not compatible", "Discord-RPC for GTA VC 1.0 English", MB_ICONERROR);
+			Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s",
+				plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10EN));
+			LOGGING << "Error: " << GetGameVersionName() << " is not compatible with this mod, these are supported version:\n" << GetGameVersionName(GAME_10EN) << "\nDiscord Module won't initialized." << std::endl;
+
 		}
 #endif 
 		break;
@@ -241,6 +258,8 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 	{
 
 		Discord_Shutdown();
+
+		LOGGING << GetGameVersionName() << " has been shutdown, Detaching." << std::endl; // there's bug where this log doesn't appear when discord module is initialized.
 
 		break;
 
