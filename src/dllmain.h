@@ -31,8 +31,23 @@ static const char* APPLICATION_ID = "928498189236068393";
 #define GAME "SA"
 #endif
 
-static std::ofstream LOGGING = std::ofstream("Discord_" GAME ".log");
+static std::ofstream LOGGER = std::ofstream("Discord_" GAME ".log");
 
+void Logger(const char* format, ...)
+{
+	SYSTEMTIME timemonthday;
+	static char   sBufferz[1024];
+
+	GetLocalTime(&timemonthday);
+	sprintf(sBufferz, "%02d/%02d/%04d %02d:%02d:%02d.%03d ", timemonthday.wDay, timemonthday.wMonth, timemonthday.wYear, timemonthday.wHour, timemonthday.wMinute, timemonthday.wSecond, timemonthday.wMilliseconds);
+	va_list arg;
+	va_start(arg, format);
+	vsprintf(sBufferz + strlen(sBufferz), format, arg);
+	va_end(arg);
+	LOGGER << sBufferz << std::endl;
+	OutputDebugString(sBufferz);
+	OutputDebugString("\n");
+}
 
 class Game
 {

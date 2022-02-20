@@ -67,7 +67,7 @@ void RPC()
 	if (GetModuleHandleA("SAMP.dll") || GetModuleHandleA("SAMP.asi"))
 	{
 		MessageBox(RsGlobal.ps->window, "SA-MP are not compatible with this mod.", "Discord-RPC for GTA SA 1.0 Hoodlum", MB_ICONERROR);
-		LOGGING << "Error: SA-MP are not compatible with this mod." << std::endl;
+		Logger("Error: SA-MP are not compatible with this mod.");
 	}
 	else
 	{
@@ -79,7 +79,7 @@ void RPC()
 		drp.startTimestamp = time(0);
 		Discord_Initialize(APPLICATION_ID, 0, 0, 0);
 
-		LOGGING << "Success: Discord Module initialized." << std::endl;
+		Logger("Success: Discord Module initialized.");
 
 		while (1)
 		{
@@ -123,7 +123,7 @@ void RPC()
 	drp.startTimestamp = time(0);
 	Discord_Initialize(APPLICATION_ID, 0, 0, 0);
 
-	LOGGING << "Success: Discord Module initialized." << std::endl;
+	Logger("Success: Discord Module initialized.");
 
 	while (1)
 	{
@@ -170,7 +170,7 @@ void RPC()
 	drp.startTimestamp = time(0);
 	Discord_Initialize(APPLICATION_ID, 0, 0, 0);
 
-	LOGGING << "Success: Discord Module initialized." << std::endl;
+	Logger("Success: Discord Module initialized.");
 
 	while (1)
 	{
@@ -207,14 +207,14 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 		{
 
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
-			LOGGING << "Success: " << GetGameVersionName() << " is compatible with this mod, now waiting for Discord Module initialized." << std::endl;
+			Logger("Success %s is compatible with this mod, now waiting for Discord Module initialized.", GetGameVersionName());
 
 		}
 		else
 		{
 			Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s",
 				plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10EN));
-			LOGGING << "Error: " << GetGameVersionName() << " is not compatible with this mod, these are supported version:\n" << GetGameVersionName(GAME_10EN) << "\nDiscord Module won't initialized." << std::endl;
+			Logger("Error: %s is not compatible with this mod, these are supported version:\n%s", GetGameVersionName(), GetGameVersionName(GAME_10EN));
 		}
 #endif
 
@@ -223,14 +223,14 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 			{
 
 				CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
-				LOGGING << "Success: " << GetGameVersionName() << " is compatible with this mod, now waiting for Discord Module initialized." << std::endl;
+				Logger("Success %s is compatible with this mod, now waiting for Discord Module initialized.", GetGameVersionName());
 
 			}
 			else
 			{
 				Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s \n- %s",
 					plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT));
-				LOGGING << "Error: " << GetGameVersionName() << " is not compatible with this mod, these are supported version:\n" << GetGameVersionName(GAME_10US_HOODLUM) << " & " << GetGameVersionName(GAME_10US_COMPACT) << "\nDiscord Module won't initialized." << std::endl;
+				Logger("Error: %s is not compatible with this mod, these are supported version:\n%s & %s", GetGameVersionName(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT));
 			}
 #endif
 
@@ -239,14 +239,14 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 		{
 
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
-			LOGGING << "Success: " << GetGameVersionName() << " is compatible with this mod, now waiting for Discord Module initialized." << std::endl;
+			Logger("Success %s is compatible with this mod, now waiting for Discord Module initialized.", GetGameVersionName());
 
 		}
 		else
 		{
 			Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s",
 				plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10EN));
-			LOGGING << "Error: " << GetGameVersionName() << " is not compatible with this mod, these are supported version:\n" << GetGameVersionName(GAME_10EN) << "\nDiscord Module won't initialized." << std::endl;
+			Logger("Error: %s is not compatible with this mod, these are supported version:\n%s", GetGameVersionName(), GetGameVersionName(GAME_10EN));
 
 		}
 #endif 
@@ -255,7 +255,7 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 
 	case DLL_PROCESS_DETACH:
 	{
-		LOGGING << GetGameVersionName() << " has been shutdown, Detaching." << std::endl;
+		Logger("%s has been shutdown, Detaching.", GetGameVersionName());
 		Sleep(350);
 
 		Events::shutdownRwEvent += []
