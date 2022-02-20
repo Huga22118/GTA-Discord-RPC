@@ -66,7 +66,6 @@ void RPC()
 
 	if (GetModuleHandleA("SAMP.dll") || GetModuleHandleA("SAMP.asi"))
 	{
-		FreeLibraryAndExitThread(module, 0);
 		MessageBox(RsGlobal.ps->window, "SA-MP are not compatible with this mod.", "Discord-RPC for GTA SA 1.0 Hoodlum", MB_ICONERROR);
 		LOGGING << "Error: SA-MP are not compatible with this mod." << std::endl;
 	}
@@ -220,19 +219,19 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 #endif
 
 #ifdef GTASA
-		if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT)
-		{
+			if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT)
+			{
 
-			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
-			LOGGING << "Success: " << GetGameVersionName() << " is compatible with this mod, now waiting for Discord Module initialized." << std::endl;
+				CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
+				LOGGING << "Success: " << GetGameVersionName() << " is compatible with this mod, now waiting for Discord Module initialized." << std::endl;
 
-		}
-		else
-		{
-			Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s \n- %s",
-				plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT));
-			LOGGING << "Error: " << GetGameVersionName() << " is not compatible with this mod, these are supported version:\n" << GetGameVersionName(GAME_10US_HOODLUM) << " & " << GetGameVersionName(GAME_10US_COMPACT) << "\nDiscord Module won't initialized." << std::endl;
-		}
+			}
+			else
+			{
+				Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s \n- %s",
+					plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT));
+				LOGGING << "Error: " << GetGameVersionName() << " is not compatible with this mod, these are supported version:\n" << GetGameVersionName(GAME_10US_HOODLUM) << " & " << GetGameVersionName(GAME_10US_COMPACT) << "\nDiscord Module won't initialized." << std::endl;
+			}
 #endif
 
 #ifdef GTAVC
@@ -256,10 +255,13 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 
 	case DLL_PROCESS_DETACH:
 	{
+		LOGGING << GetGameVersionName() << " has been shutdown, Detaching." << std::endl;
+		Sleep(350);
 
-		Discord_Shutdown();
-
-		LOGGING << GetGameVersionName() << " has been shutdown, Detaching." << std::endl; // there's bug where this log doesn't appear when discord module is initialized.
+		Events::shutdownRwEvent += []
+		{
+			Discord_Shutdown();
+		};
 
 		break;
 
