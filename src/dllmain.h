@@ -2,6 +2,7 @@
 
 #include "plugin.h"
 #include "discord-rpc.h"
+#include "ini/IniReader.h"
 #include <string>
 #include <ctime>
 #include <iostream>
@@ -32,6 +33,7 @@ static const char* APPLICATION_ID = "928498189236068393";
 #endif
 
 static std::ofstream LOGGER = std::ofstream("Discord_" GAME ".log");
+static inline bool IfIniFailed;
 
 void Logger(const char* format, ...)
 {
@@ -58,6 +60,9 @@ public:
 	int PlayerMoneyValue();
 	int PlayerCurrentWeapon();
 	bool PlayerCondition();
+	static void Ini();
+	float SAPlayerHealth();
+	float SAPlayerArmour();
 };
 
 const std::string weaponNames[] =

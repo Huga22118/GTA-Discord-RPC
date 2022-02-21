@@ -55,9 +55,58 @@ bool Game::PlayerCondition()
 	return *reinterpret_cast<int*>(*reinterpret_cast<int*>(0x94AD28) + 0x3AC);
 }
 
+float Game::SAPlayerHealth()
+{
+	try 
+	{
+		return *reinterpret_cast<float*>(*reinterpret_cast<int*>(0xB6F5F0) + 0x540);
+	}
+	catch (...)
+	{
+		return 0.0;
+	}
+}
+
+float Game::SAPlayerArmour()
+{
+	try
+	{
+		return *reinterpret_cast<float*>(*reinterpret_cast<int*>(0xB6F5F0) + 0x548);
+	}
+	catch (...)
+	{
+		return 0.0;
+	}
+}
+
 #ifdef GTASA
 void RPC()
 {
+	int DCStatus = 1;
+	bool ShowDetectedIni = true;
+
+	CIniReader ini("Discord_" GAME ".ini");
+
+	if (ini.data.size() <= 0)
+	{
+		Logger("Error: Discord_%s.ini not found!", GAME);
+		Error("Discord_%s.ini not found!", GAME);
+		IfIniFailed = true;
+	}
+	else
+	{
+		Logger("Success: Discord_%s.ini Loaded", GAME);
+		IfIniFailed = false;
+	}
+
+	DCStatus = ini.ReadInteger("Discord", "DiscordStatus", 1);
+	ShowDetectedIni = ini.ReadInteger("Discord", "ShowDetectedINIMsg", 0);
+
+	if (ShowDetectedIni)
+	{
+		MessageBoxA(HWND_DESKTOP, "Discord_" GAME ".ini detected!", GetGameVersionName(), MB_ICONINFORMATION);
+	}
+
 	while (*(DWORD*)0xC8D4C0 != 9)
 		Sleep(350);
 
@@ -66,7 +115,7 @@ void RPC()
 
 	if (GetModuleHandleA("SAMP.dll") || GetModuleHandleA("SAMP.asi"))
 	{
-		MessageBox(RsGlobal.ps->window, "SA-MP are not compatible with this mod.", "Discord-RPC for GTA SA 1.0 Hoodlum", MB_ICONERROR);
+		Error("SA-MP Detected!");
 		Logger("Error: SA-MP are not compatible with this mod.");
 	}
 	else
@@ -86,8 +135,28 @@ void RPC()
 			if (rpc->PlayerPointer())
 			{
 
-				details = "Money: $" + std::to_string(rpc->PlayerMoneyValue());
-				state = "Time: " + rpc->PlayerTime();
+				if (DCStatus == 1)
+				{
+					details = "Money: $" + std::to_string(rpc->PlayerMoneyValue());
+					state = "Time: " + rpc->PlayerTime();
+
+					drp.details = details.c_str();
+					drp.state = state.c_str();
+				}
+				else if (DCStatus == 2)
+				{
+					char health[64];
+					sprintf_s(health, "Health: %.2f%%", rpc->SAPlayerHealth());
+					details = health;
+
+					char armour[64];
+					sprintf_s(armour, "Armour: %.2f%%", rpc->SAPlayerArmour());
+					state = armour;
+
+					drp.details = details.c_str();
+					drp.state = state.c_str();
+				}
+
 				smallImageText = weaponNames[rpc->PlayerCurrentWeapon()];
 				largeImageText = GetGameVersionName();
 
@@ -97,8 +166,6 @@ void RPC()
 				drp.smallImageText = smallImageText.c_str();
 				drp.largeImageText = largeImageText.c_str();
 				drp.smallImageKey = weaponIcons[rpc->PlayerCurrentWeapon()].c_str();;
-				drp.details = details.c_str();
-				drp.state = state.c_str();
 
 				Discord_UpdatePresence(&drp);
 				Sleep(100);
@@ -207,7 +274,7 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 		{
 
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
-			Logger("Success %s is compatible with this mod, now waiting for Discord Module initialized.", GetGameVersionName());
+			Logger("Success: %s is compatible with this mod, now waiting for Discord Module initialized.", GetGameVersionName());
 
 		}
 		else
@@ -221,10 +288,8 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 #ifdef GTASA
 			if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT)
 			{
-
-				CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
-				Logger("Success %s is compatible with this mod, now waiting for Discord Module initialized.", GetGameVersionName());
-
+					CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
+					Logger("Success: %s is compatible with this mod, now waiting for Discord Module initialized.", GetGameVersionName());
 			}
 			else
 			{
@@ -239,7 +304,7 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 		{
 
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
-			Logger("Success %s is compatible with this mod, now waiting for Discord Module initialized.", GetGameVersionName());
+			Logger("Success: %s is compatible with this mod, now waiting for Discord Module initialized.", GetGameVersionName());
 
 		}
 		else
