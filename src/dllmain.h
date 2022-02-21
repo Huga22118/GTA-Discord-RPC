@@ -60,7 +60,6 @@ public:
 	int PlayerMoneyValue();
 	int PlayerCurrentWeapon();
 	bool PlayerCondition();
-	static void Ini();
 	float SAPlayerHealth();
 	float SAPlayerArmour();
 };
