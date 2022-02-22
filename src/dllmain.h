@@ -22,18 +22,22 @@ static const char* APPLICATION_ID = "928498189236068393";
 
 #ifdef GTAVC
 #define GAME "VC"
+#define GAMELIST(sa_compacthoodlum, vc, iii) vc
 #endif
 
 #ifdef GTA3
 #define GAME "III"
+#define GAMELIST(sa_compacthoodlum, vc, iii) iii
 #endif
 
 #ifdef GTASA
 #define GAME "SA"
+#define GAMELIST(sa_compacthoodlum, vc, iii) sa_compacthoodlum
 #endif
 
 static std::ofstream LOGGER = std::ofstream("Discord_" GAME ".log");
 static inline bool IfIniFailed;
+static inline bool IfSampExist;
 
 void Logger(const char* format, ...)
 {

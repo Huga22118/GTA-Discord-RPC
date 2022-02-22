@@ -110,16 +110,8 @@ void RPC()
 	while (*(DWORD*)0xC8D4C0 != 9)
 		Sleep(350);
 
-	HMODULE module = NULL;
-	rpc = new Game();
-
-	if (GetModuleHandleA("SAMP.dll") || GetModuleHandleA("SAMP.asi"))
-	{
-		Error("SA-MP Detected!");
-		Logger("Error: SA-MP are not compatible with this mod.");
-	}
-	else
-	{
+	    HMODULE module = NULL;
+	    rpc = new Game();
 		std::string details, state, largeImageText, smallImageText;
 
 		DiscordRichPresence drp;
@@ -170,7 +162,6 @@ void RPC()
 				Discord_UpdatePresence(&drp);
 				Sleep(100);
 			}
-		}
 	}
 }
 #endif
@@ -261,6 +252,35 @@ void RPC()
 }
 #endif
 
+void Attach()
+{
+#ifdef GTASA
+	if (GetModuleHandleA("SAMP.dll") || GetModuleHandleA("SAMP.asi"))
+	{
+		Error("SA-MP Detected!");
+		Logger("Error: SA-MP are not compatible with this mod.");
+		IfSampExist = true;
+	}
+	else
+	{
+		CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
+		IfSampExist = false;
+	}
+#else
+	    CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
+#endif
+
+	
+}
+
+void Detach()
+{
+	Events::shutdownRwEvent += []
+	{
+		Discord_Shutdown();
+	};
+}
+
 BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 {
 	switch (reason)
@@ -269,52 +289,28 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 	case DLL_PROCESS_ATTACH:
 	{
 
-#ifdef GTA3
-		if (GetGameVersion() == GAME_10EN)
-		{
-
-			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
-			Logger("Success: %s is compatible with this mod, now waiting for Discord Module initialized.", GetGameVersionName());
-
-		}
-		else
-		{
-			Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s",
-				plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10EN));
-			Logger("Error: %s is not compatible with this mod, these are supported version:\n%s", GetGameVersionName(), GetGameVersionName(GAME_10EN));
-		}
-#endif
-
 #ifdef GTASA
-			if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT)
-			{
-					CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
-					Logger("Success: %s is compatible with this mod, now waiting for Discord Module initialized.", GetGameVersionName());
-			}
-			else
-			{
-				Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s \n- %s",
-					plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT));
-				Logger("Error: %s is not compatible with this mod, these are supported version:\n%s & %s", GetGameVersionName(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT));
-			}
+		if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT)
+#else
+		if (GetGameVersion() == GAMELIST(NULL, GAME_10EN, GAME_10EN))
 #endif
 
-#ifdef GTAVC
-		if (GetGameVersion() == GAME_10EN)
 		{
-
-			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
+			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&Attach, nullptr, NULL, nullptr);
 			Logger("Success: %s is compatible with this mod, now waiting for Discord Module initialized.", GetGameVersionName());
-
 		}
 		else
 		{
+#ifdef GTASA	
+			Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s \n- %s",
+				plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT));
+			Logger("Error: %s is not compatible with this mod, these are supported version:\n%s & %s", GetGameVersionName(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT));
+#else
 			Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s",
 				plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10EN));
 			Logger("Error: %s is not compatible with this mod, these are supported version:\n%s", GetGameVersionName(), GetGameVersionName(GAME_10EN));
-
+#endif
 		}
-#endif 
 		break;
 	}
 
@@ -323,10 +319,7 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 		Logger("%s has been shutdown, Detaching.", GetGameVersionName());
 		Sleep(350);
 
-		Events::shutdownRwEvent += []
-		{
-			Discord_Shutdown();
-		};
+		CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&Detach, nullptr, NULL, nullptr);
 
 		break;
 
