@@ -104,7 +104,7 @@ void RPC()
 
 	if (ShowDetectedIni)
 	{
-		MessageBoxA(HWND_DESKTOP, "Discord_" GAME ".ini detected!", GetGameVersionName(), MB_ICONINFORMATION);
+		Message("Discord_%s.ini Detected!", GAME);
 	}
 
 	while (*(DWORD*)0xC8D4C0 != 9)
