@@ -4,114 +4,67 @@ using namespace plugin;
 
 Game* rpc;
 
-bool Game::PlayerPointer()
-{
-#ifdef GTASA
-	return *reinterpret_cast<int*>(0xB6F5F0);
-#endif
+int DCStatus = 1;
+bool ShowDetectedIni = true;
+bool ShowLOG = true;
 
-#ifdef GTAVC
-	return *reinterpret_cast<int*>(0x94AD28);
-#endif
-
-#ifdef GTA3
-	return *reinterpret_cast<int*>(0x6FB1C8);
-#endif
-}
-
-int Game::PlayerMoneyValue()
-{
-#ifdef GTASA
-	return *reinterpret_cast<int*>(0xB7CE50);
-#endif
-
-#ifdef GTA3
-	return *reinterpret_cast<int*>(0x94139C);
-#endif
-}
-
-std::string Game::PlayerTime()
-{
-	BYTE minutes = *reinterpret_cast<BYTE*>(0xB70152);
-	std::string minstr;
-	if (minutes < 10) minstr = "0" + std::to_string(minutes);
-	else minstr = std::to_string(minutes);
-	return std::to_string(*reinterpret_cast<BYTE*>(0xB70153)) + ":" + minstr;
-}
-
-int Game::PlayerCurrentWeapon()
-{
-#ifdef GTASA
-	return *reinterpret_cast<int*>(0xBAA410);
-#endif
-
-#ifdef GTAVC
-	return *reinterpret_cast<unsigned int*>(0x978DA8);
-#endif
-}
-
-bool Game::PlayerCondition()
-{
-	return *reinterpret_cast<int*>(*reinterpret_cast<int*>(0x94AD28) + 0x3AC);
-}
-
-float Game::SAPlayerHealth()
-{
-	try 
+/*
+    Code Taken from MixSets Repo!!
+*/
+bool Game::IniBool(CIniReader ini, std::string section, std::string key)
+{	
+	bool b = ini.ReadInteger(section, key, 0) == 1;
+	if (b == true)
 	{
-		return *reinterpret_cast<float*>(*reinterpret_cast<int*>(0xB6F5F0) + 0x540);
-	}
-	catch (...)
-	{
-		return 0.0;
-	}
-}
-
-float Game::SAPlayerArmour()
-{
-	try
-	{
-		return *reinterpret_cast<float*>(*reinterpret_cast<int*>(0xB6F5F0) + 0x548);
-	}
-	catch (...)
-	{
-		return 0.0;
-	}
-}
-
-#ifdef GTASA
-void RPC()
-{
-	int DCStatus = 1;
-	bool ShowDetectedIni = true;
-
-	CIniReader ini("Discord_" GAME ".ini");
-
-	if (ini.data.size() <= 0)
-	{
-		Logger("Error: Discord_%s.ini not found!", GAME);
-		Error("Discord_%s.ini not found!", GAME);
-		IfIniFailed = true;
+		LOGGER << key << " = true" << std::endl;
+		return true;
 	}
 	else
 	{
-		Logger("Success: Discord_%s.ini Loaded", GAME);
-		IfIniFailed = false;
+		LOGGER << key << " = false" << std::endl;
+		return false;
 	}
+}
 
-	DCStatus = ini.ReadInteger("Discord", "DiscordStatus", 1);
-	ShowDetectedIni = ini.ReadInteger("Discord", "ShowDetectedINIMsg", 0);
+void Game::Init()
+{
+	static char  sBufferz[1024];
+	sprintf(sBufferz, "%s is compatible with this plugin.\n", GetGameVersionName());
+	LOGGER << sBufferz << std::endl;
+
+	CIniReader ini("Discord_" GAME ".ini");
+	DCStatus = IniBool(ini, "Discord", "DiscordStatus");
+	ShowDetectedIni = IniBool(ini, "Discord", "ShowDetectedINIMsg");
+	ShowLOG = IniBool(ini, "Discord", "EnableLogger");
+
+	if (ini.data.size() <= 0)
+	{
+		Error("Discord_%s.ini not found!", GAME);
+		IfIniFailed = true;
+		return;
+	}
 
 	if (ShowDetectedIni)
 	{
 		Message("Discord_%s.ini Detected!", GAME);
 	}
 
-	while (*(DWORD*)0xC8D4C0 != 9)
-		Sleep(350);
+	rpc->Update();
+}
 
-	    HMODULE module = NULL;
-	    rpc = new Game();
+void Game::Update()
+{
+	if (ShowLOG)
+	{
+		LOGGER << std::endl;
+		Logger("Starting Discord RPC Plugins.");
+	}
+
+	Events::initRwEvent += []
+	{
+		CIniReader ini;
+
+		rpc = new Game();
 		std::string details, state, largeImageText, smallImageText;
 
 		DiscordRichPresence drp;
@@ -120,164 +73,68 @@ void RPC()
 		drp.startTimestamp = time(0);
 		Discord_Initialize(APPLICATION_ID, 0, 0, 0);
 
-		Logger("Success: Discord Module initialized.");
-
-		while (1)
+		if (ShowLOG)
 		{
-			if (rpc->PlayerPointer())
+			Logger("Discord Module Initialized!");
+		}
+
+		if (DCStatus)
+		{
+#ifdef GTA3
+			if (GetGameVersion() == GAME_10EN)
 			{
-
-				if (DCStatus == 1)
-				{
-					details = "Money: $" + std::to_string(rpc->PlayerMoneyValue());
-					state = "Time: " + rpc->PlayerTime();
-
-					drp.details = details.c_str();
-					drp.state = state.c_str();
-				}
-				else if (DCStatus == 2)
-				{
-					char health[64];
-					sprintf_s(health, "Health: %.2f%%", rpc->SAPlayerHealth());
-					details = health;
-
-					char armour[64];
-					sprintf_s(armour, "Armour: %.2f%%", rpc->SAPlayerArmour());
-					state = armour;
-
-					drp.details = details.c_str();
-					drp.state = state.c_str();
-				}
-
-				smallImageText = weaponNames[rpc->PlayerCurrentWeapon()];
-				largeImageText = GetGameVersionName();
-
-
-				drp.largeImageKey = "game_icon";
-
-				drp.smallImageText = smallImageText.c_str();
-				drp.largeImageText = largeImageText.c_str();
-				drp.smallImageKey = weaponIcons[rpc->PlayerCurrentWeapon()].c_str();;
-
-				Discord_UpdatePresence(&drp);
-				Sleep(100);
+				details = "Game: III";
 			}
-	}
-}
+#elif GTASA
+			if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT)
+			{
+				details = "Game: San Andreas";
+			}
+#elif GTAVC
+			if (GetGameVersion() == GAME_10EN)
+			{
+				details = "Game: VC";
+			}
 #endif
-
-#ifdef GTAVC
-void RPC()
-{
-    while (*(DWORD*)0x9B5F08 != 9)
-				Sleep(350);
-
-	rpc = new Game();
-	std::string details, state, largeImageText;
-
-	DiscordRichPresence drp;
-
-	drp = { 0 };
-	drp.startTimestamp = time(0);
-	Discord_Initialize(APPLICATION_ID, 0, 0, 0);
-
-	Logger("Success: Discord Module initialized.");
-
-	while (1)
-	{
-		if (rpc->PlayerPointer())
-		{
-			if (rpc->PlayerCondition())
+#ifdef GTA3
+			if (GetGameVersion() == GAME_10EN)
 			{
-				details = "On Vehicle";
+				state = "Version: 1.0 EN";
 			}
-			else
+#elif GTASA
+			if (GetGameVersion() == GAME_10US_HOODLUM)
 			{
-				details = "On Foot";
-	        }
-
-			state = "Weapon: " + weaponNames[rpc->PlayerCurrentWeapon()];
-
-			largeImageText = GetGameVersionName();
-
-			drp.largeImageKey = "game_icon";
-
-			drp.largeImageText = largeImageText.c_str();
+				state = "Version: 1.0 US Hoodlum";
+			}
+			else if (GetGameVersion() == GAME_10US_COMPACT)
+			{
+				state = "Version: 1.0 US Compact";
+			}
+#elif GTAVC
+			if (GetGameVersion() == GAME_10EN)
+			{
+				state = "Version: 1.0 EN";
+			}
+#endif
 			drp.details = details.c_str();
 			drp.state = state.c_str();
+		}
 
-			Discord_UpdatePresence(&drp);
-			Sleep(100);
-        }
-	}
-}
-#endif
+		largeImageText = "GTA Trilogy Discord RPC Plugin";
 
 #ifdef GTA3
-void RPC()
-{
-	while (*(DWORD*)0x8F5838 != 9)
-    Sleep(350);
-
-	rpc = new Game();
-	std::string details, state, largeImageText;
-
-	DiscordRichPresence drp;
-
-	drp = { 0 };
-	drp.startTimestamp = time(0);
-	Discord_Initialize(APPLICATION_ID, 0, 0, 0);
-
-	Logger("Success: Discord Module initialized.");
-
-	while (1)
-	{
-		if (rpc->PlayerPointer())
-		{
-
-			details = "In-Game";
-			state = "Money: $" + std::to_string(rpc->PlayerMoneyValue());
-
-			largeImageText = GetGameVersionName();
-
-			drp.largeImageKey = "icon";
-			drp.largeImageText = largeImageText.c_str();
-			drp.details = details.c_str();
-			drp.state = state.c_str();
-
-			Discord_UpdatePresence(&drp);
-			Sleep(100);
-		}
-	}
-}
+		drp.largeImageKey = "iii";
+#elif GTASA
+		drp.largeImageKey = "sa";
+#elif GTAVC
+		drp.largeImageKey = "vc";
 #endif
 
-void Attach()
-{
-#ifdef GTASA
-	if (GetModuleHandleA("SAMP.dll") || GetModuleHandleA("SAMP.asi"))
-	{
-		Error("SA-MP Detected!");
-		Logger("Error: SA-MP are not compatible with this mod.");
-		IfSampExist = true;
-	}
-	else
-	{
-		CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
-		IfSampExist = false;
-	}
-#else
-	    CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&RPC, nullptr, NULL, nullptr);
-#endif
+		drp.smallImageText = smallImageText.c_str();
+		drp.largeImageText = largeImageText.c_str();
 
-	
-}
-
-void Detach()
-{
-	Events::shutdownRwEvent += []
-	{
-		Discord_Shutdown();
+		Discord_UpdatePresence(&drp);
+		Sleep(100);
 	};
 }
 
@@ -288,38 +145,82 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 
 	case DLL_PROCESS_ATTACH:
 	{
-
 #ifdef GTASA
-		if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT)
-#else
-		if (GetGameVersion() == GAMELIST(NULL, GAME_10EN, GAME_10EN))
-#endif
-
+		if (GetModuleHandleA("SAMP.dll") || GetModuleHandleA("SAMP.asi"))
 		{
-			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&Attach, nullptr, NULL, nullptr);
-			Logger("Success: %s is compatible with this mod, now waiting for Discord Module initialized.", GetGameVersionName());
+			if (GetGameVersion() != GAME_10US_HOODLUM || GetGameVersion() != GAME_10US_COMPACT)
+			{
+				static char   sBufferz[1024];
+				sprintf(sBufferz, "GTA Trilogy Discord RPC\nv4.0 \n\nSA-MP Detected and this plugin are incompatible with this version \n- %s", GetGameVersionName());
+				LOGGER << sBufferz << "\n" << std::endl;
+
+				Error("SA-MP Detected and this plugin are incompatible with this version \n- %s", GetGameVersionName());
+				IfSampExist = true;
+			}
+			else
+			{
+				static char  sBufferz[1024];
+				sprintf(sBufferz, "GTA Trilogy Discord RPC\nv4.0 \n\nSA-MP Detected! Ignoring Plugin.");
+				LOGGER << sBufferz << std::endl;
+
+				Error("SA-MP Detected!");
+				IfSampExist = true;
+			}
 		}
 		else
 		{
-#ifdef GTASA	
-			Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s \n- %s",
-				plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT));
-			Logger("Error: %s is not compatible with this mod, these are supported version:\n%s & %s", GetGameVersionName(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT));
+			if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT)
+			{
+				static char  sBufferz[1024];
+				sprintf(sBufferz, "GTA Trilogy Discord RPC\nv4.0\n");
+				LOGGER << sBufferz << std::endl;
+
+				rpc->Init();
+				IfSampExist = false;
+			}
+			else
+			{
+				static char  sBufferz[1024];
+				sprintf(sBufferz, "GTA Trilogy Discord RPC\nv4.0 \n\nERROR: This plugin does not work with %s version.", GetGameVersionName());
+				LOGGER << sBufferz << std::endl;
+
+				Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s \n- %s",
+					plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT));
+				IfSampExist = false;
+			}
+		}
 #else
+		if (GetGameVersion() == GAMELIST(NULL, GAME_10EN, GAME_10EN))
+		{
+			static char  sBufferz[1024];
+			sprintf(sBufferz, "GTA Trilogy Discord RPC\nv4.0\n");
+			LOGGER << sBufferz << std::endl;
+
+			rpc->Init();
+		}
+		else
+		{
 			Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s",
 				plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10EN));
-			Logger("Error: %s is not compatible with this mod, these are supported version:\n%s", GetGameVersionName(), GetGameVersionName(GAME_10EN));
-#endif
+
+			static char  sBufferz[1024];
+			sprintf(sBufferz, "GTA Trilogy Discord RPC\nv4.0 \n\nERROR: This plugin does not work with %s version.", GetGameVersionName());
+			LOGGER << sBufferz << std::endl;
 		}
-		break;
+#endif
+			break;
 	}
 
 	case DLL_PROCESS_DETACH:
 	{
-		Logger("%s has been shutdown, Detaching.", GetGameVersionName());
-		Sleep(350);
+		if (ShowLOG)
+		{
+			Logger("%s has been shutdown, Detaching.", GetGameVersionName());
+		}
 
-		CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&Detach, nullptr, NULL, nullptr);
+		Discord_Shutdown();
+
+		Sleep(350);
 
 		break;
 

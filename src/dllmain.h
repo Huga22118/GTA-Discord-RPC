@@ -8,17 +8,7 @@
 #include <iostream>
 #include <windows.h>
 
-#ifdef GTASA
-static const char* APPLICATION_ID = "698510493282992139";
-#endif
-
-#ifdef GTAVC
-static const char* APPLICATION_ID = "929277207736643584";
-#endif
-
-#ifdef GTA3
-static const char* APPLICATION_ID = "928498189236068393";
-#endif
+static const char* APPLICATION_ID = "946628098693144626";
 
 #ifdef GTAVC
 #define GAME "VC"
@@ -38,6 +28,10 @@ static const char* APPLICATION_ID = "928498189236068393";
 static std::ofstream LOGGER = std::ofstream("Discord_" GAME ".log");
 static inline bool IfIniFailed;
 static inline bool IfSampExist;
+
+extern int DCStatus;
+extern bool ShowDetectedIni;
+extern bool ShowLOG;
 
 void Logger(const char* format, ...)
 {
@@ -59,13 +53,10 @@ class Game
 {
 public:
 
-	bool PlayerPointer();
-	std::string PlayerTime();
-	int PlayerMoneyValue();
-	int PlayerCurrentWeapon();
-	bool PlayerCondition();
-	float SAPlayerHealth();
-	float SAPlayerArmour();
+	void Update();
+	void Init();
+	static bool IniBool(CIniReader ini, std::string section, std::string key);
+
 };
 
 const std::string weaponNames[] =
@@ -221,6 +212,3 @@ const std::string weaponIcons[] =
 #endif
 
 extern Game* rpc;
-#ifdef GTASA
-extern HMODULE module;
-#endif
