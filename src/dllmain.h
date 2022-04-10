@@ -7,6 +7,7 @@
 #include <ctime>
 #include <iostream>
 #include <windows.h>
+#include <GameVersion.h>
 
 static const char* APPLICATION_ID = "946628098693144626";
 
@@ -59,156 +60,47 @@ public:
 
 };
 
-const std::string weaponNames[] =
-{
+inline char const* GetGameVersionNames(int gameVersionId) {
+    switch (gameVersionId) {
 #ifdef GTASA
-	{ "Fist" },
-	{ "Brass Knuckles" },
-	{ "Golf Club" },
-	{ "Night Stick" },
-	{ "Knife" },
-	{ "Bat" },
-	{ "Shovel" },
-	{ "Pool Cue" },
-	{ "Katana" },
-	{ "Chainsaw" },
-	{ "Purple Dildo" },
-	{ "Dildo" },
-	{ "Vibrator" },
-	{ "Silver Vibrator" },
-	{ "Flowers" },
-	{ "Cane" },
-	{ "Grenade" },
-	{ "Teargas" },
-	{ "Molotov" },
-	{ " " }, // Unused
-	{ " " }, // Unused
-	{ " " }, // Unused
-	{ "Colt 45" },
-	{ "Silenced Pistol" },
-	{ "Desert Eagle" },
-	{ "Shotgun" },
-	{ "Sawnoff-Shotgun" },
-	{ "Combat Shotgun" },
-	{ "Uzi" },
-	{ "MP5" },
-	{ "AK-47" },
-	{ "M4" },
-	{ "Tec-9" },
-	{ "Country Rifle" },
-	{ "Sniper Rifle" },
-	{ "Rocket Launcher" },
-	{ "Heat-Seeking RPG" },
-	{ "Flamethrower" },
-	{ "Minigun" },
-	{ "Satchel Charges" },
-	{ "Detonator" },
-	{ "Spray Can" },
-	{ "Fire Extinguisher" },
-	{ "Camera" },
-	{ "Night Vision" },
-	{ "Thermal Goggles" },
-	{ "Parachute" },
-	{ "Fake Pistol" }
+    case GAME_10US_COMPACT:
+        return "1.0 US Compact";
+    case GAME_10US_HOODLUM:
+        return "1.0 US Hoodlum";
+    case GAME_10EU:
+        return "1.0 EU";
+    case GAME_11US:
+        return "1.01 US";
+    case GAME_11EU:
+        return "1.01 EU";
+    case GAME_STEAM:
+        return "Steam";
+    case GAME_STEAM_LV:
+        return "Steam LV";
 #endif
-
 #ifdef GTAVC
-	{ "Fist" },
-	{ "Brass Knuckle"},
-	{ "Screwdriver" },
-	{ "Golf Club" },
-	{ "Nightstick" },
-	{ "Knife" },
-	{ "Baseball" },
-	{ "Hammer" },
-	{ "Cleaver" },
-	{ "Machete" },
-	{ "Katana" },
-	{ "Chainsaw" },
-	{ "Grenade" },
-	{ "Remote Grenade" },
-	{ "Teargas" },
-	{ "Molotov" },
-	{ " " }, // Rocket
-	{ "Colt 45" },
-	{ "Python" },
-	{ "Shotgun" },
-	{ "Spas-12 Shotgun" },
-	{ "Stubby Shotgun" },
-	{ "Tec-9" },
-	{ "Uzi" },
-	{ "Silenced Ingram" },
-	{ "MP5" },
-	{ "M4" },
-	{ "Kruger" },
-	{ "Sniper-Rifle" },
-	{ "Laser Scope" },
-	{ "Rocket Launcher" },
-	{ "Flame Thrower" },
-	{ "M60" },
-	{ "Minigun" },
-	{ "Detonator" },
-	{ " " }, // Helicannon
-	{ "Camera" }
+    case GAME_10EN:
+        return "1.0 EN";
+    case GAME_11EN:
+        return "1.1 EN";
+    case GAME_STEAM:
+        return "Steam";
 #endif
-
 #ifdef GTA3
- { " " } // unused because we cannot find the weapon memory addresses for this one
+    case GAME_10EN:
+        return "1.0 EN";
+    case GAME_11EN:
+        return "1.1 EN";
+    case GAME_STEAM:
+        return "Steam";
 #endif
+    }
+    return "Unknown";
+}
 
-};
-
-#ifdef GTASA
-const std::string weaponIcons[] =
+inline char const* GetGameVersionNames() 
 {
-	{ "fist" },
-	{ "brassknuckleicon" },
-	{ "golfclubicon" },
-	{ "nitestickicon" },
-	{ "knifecuricon" },
-	{ "baticon" },
-	{ "shovelicon" },
-	{ "poolcueicon" },
-	{ "katanaicon" },
-	{ "chnsawicon" },
-	{ "dildo1icon" },
-	{ "dildo2icon" },
-	{ "vibe1icon" },
-	{ "vibe2icon" },
-	{ "flowericon" },
-	{ "caneicon" },
-	{ "grenadeicon" },
-	{ "teargasicon" },
-	{ "molotovicon" },
-	{ " " },
-	{ " " },
-	{ " " },
-	{ "colt45icon" },
-	{ "silencedicon" },
-	{ "desert_eagleicon" },
-	{ "chromegunicon" },
-	{ "sawnofficon" },
-	{ "shotgspaicon" },
-	{ "micro_uziicon" },
-	{ "mp5lngicon" },
-	{ "ak47icon" },
-	{ "m4icon" },
-	{ "tec9icon" },
-	{ "cuntgunicon" },
-	{ "snipericon" },
-	{ "rocketlaicon" },
-	{ "heatseekicon" },
-	{ "flameicon" },
-	{ "minigunicon" },
-	{ "satchelicon" },
-	{ "bombicon" },
-	{ "spraycanicon" },
-	{ "fire_exicon" },
-	{ "cameraicon" },
-	{ "gogglesicon" },
-	{ "gogglesicon" },
-	{ "paraicon" },
-};
-#endif
+    return GetGameVersionNames(plugin::GetGameVersion());
+}
 
 extern Game* rpc;

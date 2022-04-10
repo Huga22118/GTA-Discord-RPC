@@ -16,22 +16,16 @@ bool Game::IniBool(CIniReader ini, std::string section, std::string key)
 	bool b = ini.ReadInteger(section, key, 0) == 1;
 	if (b == true)
 	{
-		LOGGER << key << " = true" << std::endl;
 		return true;
 	}
 	else
 	{
-		LOGGER << key << " = false" << std::endl;
 		return false;
 	}
 }
 
 void Game::Init()
 {
-	static char  sBufferz[1024];
-	sprintf(sBufferz, "%s is compatible with this plugin.\n", GetGameVersionName());
-	LOGGER << sBufferz << std::endl;
-
 	CIniReader ini("Discord_" GAME ".ini");
 	DCStatus = IniBool(ini, "Discord", "DiscordStatus");
 	ShowDetectedIni = IniBool(ini, "Discord", "ShowDetectedINIMsg");
@@ -49,6 +43,20 @@ void Game::Init()
 		Message("Discord_%s.ini Detected!", GAME);
 	}
 
+	if (ShowLOG)
+	{
+		static char   sBufferz[1024];
+		sprintf(sBufferz, "GTA Trilogy Discord RPC\nv4.1\n");
+		LOGGER << sBufferz << std::endl;
+	}
+
+	if (ShowLOG)
+	{
+		static char   sBufferz[1024];
+		sprintf(sBufferz, "%s Detected.\n", GetGameVersionName());
+		LOGGER << sBufferz << std::endl;
+	}
+
 	rpc->Update();
 }
 
@@ -57,7 +65,7 @@ void Game::Update()
 	if (ShowLOG)
 	{
 		LOGGER << std::endl;
-		Logger("Starting Discord RPC Plugins.");
+		Logger("Trying to start Events::initRwEvent.");
 	}
 
 	Events::initRwEvent += []
@@ -75,7 +83,7 @@ void Game::Update()
 
 		if (ShowLOG)
 		{
-			Logger("Discord Module Initialized!");
+			Logger("Events::initRwEvent Started!");
 		}
 
 		if (DCStatus)
@@ -86,7 +94,10 @@ void Game::Update()
 				details = "Game: III";
 			}
 #elif GTASA
-			if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT)
+			if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT ||
+				GetGameVersion() == GAME_10EU || GetGameVersion() == GAME_11US || 
+				GetGameVersion() == GAME_11EU || GetGameVersion() == GAME_STEAM ||
+				GetGameVersion() == GAME_STEAM_LV)
 			{
 				details = "Game: San Andreas";
 			}
@@ -102,13 +113,14 @@ void Game::Update()
 				state = "Version: 1.0 EN";
 			}
 #elif GTASA
-			if (GetGameVersion() == GAME_10US_HOODLUM)
+			if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT ||
+				GetGameVersion() == GAME_10EU || GetGameVersion() == GAME_11US ||
+				GetGameVersion() == GAME_11EU || GetGameVersion() == GAME_STEAM ||
+				GetGameVersion() == GAME_STEAM_LV)
 			{
-				state = "Version: 1.0 US Hoodlum";
-			}
-			else if (GetGameVersion() == GAME_10US_COMPACT)
-			{
-				state = "Version: 1.0 US Compact";
+				static char  sBufferz[1024];
+				sprintf(sBufferz, "Version: %s", GetGameVersionNames());
+				state = sBufferz;
 			}
 #elif GTAVC
 			if (GetGameVersion() == GAME_10EN)
@@ -148,20 +160,23 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 #ifdef GTASA
 		if (GetModuleHandleA("SAMP.dll") || GetModuleHandleA("SAMP.asi"))
 		{
-			if (GetGameVersion() != GAME_10US_HOODLUM || GetGameVersion() != GAME_10US_COMPACT)
+			if (GetGameVersion() != GAME_10US_HOODLUM || GetGameVersion() != GAME_10US_COMPACT ||
+				GetGameVersion() != GAME_10EU || GetGameVersion() != GAME_11US ||
+				GetGameVersion() != GAME_11EU || GetGameVersion() != GAME_STEAM ||
+				GetGameVersion() != GAME_STEAM_LV)
 			{
-				static char   sBufferz[1024];
+/*				static char   sBufferz[1024];
 				sprintf(sBufferz, "GTA Trilogy Discord RPC\nv4.0 \n\nSA-MP Detected and this plugin are incompatible with this version \n- %s", GetGameVersionName());
-				LOGGER << sBufferz << "\n" << std::endl;
+				LOGGER << sBufferz << "\n" << std::endl;*/
 
 				Error("SA-MP Detected and this plugin are incompatible with this version \n- %s", GetGameVersionName());
 				IfSampExist = true;
 			}
 			else
 			{
-				static char  sBufferz[1024];
+/*				static char  sBufferz[1024];
 				sprintf(sBufferz, "GTA Trilogy Discord RPC\nv4.0 \n\nSA-MP Detected! Ignoring Plugin.");
-				LOGGER << sBufferz << std::endl;
+				LOGGER << sBufferz << std::endl;*/
 
 				Error("SA-MP Detected!");
 				IfSampExist = true;
@@ -169,23 +184,28 @@ BOOL APIENTRY DllMain(HINSTANCE hDllHandle, DWORD reason, LPVOID lpReserved)
 		}
 		else
 		{
-			if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT)
+			if (GetGameVersion() == GAME_10US_HOODLUM || GetGameVersion() == GAME_10US_COMPACT ||
+				GetGameVersion() == GAME_10EU || GetGameVersion() == GAME_11US ||
+				GetGameVersion() == GAME_11EU || GetGameVersion() == GAME_STEAM ||
+				GetGameVersion() == GAME_STEAM_LV)
 			{
-				static char  sBufferz[1024];
+/*				static char  sBufferz[1024];
 				sprintf(sBufferz, "GTA Trilogy Discord RPC\nv4.0\n");
-				LOGGER << sBufferz << std::endl;
+				LOGGER << sBufferz << std::endl;*/
 
 				rpc->Init();
 				IfSampExist = false;
 			}
 			else
 			{
-				static char  sBufferz[1024];
+/*			    static char  sBufferz[1024];
 				sprintf(sBufferz, "GTA Trilogy Discord RPC\nv4.0 \n\nERROR: This plugin does not work with %s version.", GetGameVersionName());
-				LOGGER << sBufferz << std::endl;
+				LOGGER << sBufferz << std::endl;*/
 
-				Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s \n- %s",
-					plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT));
+				Error("This game version is not supported by %s plugin.\nThis plugin supports these game versions:\n- %s \n- %s \n- %s \n- %s \n- %s \n- %s \n- %s",
+					plugin::paths::GetPluginFileNameA(), GetGameVersionName(GAME_10US_HOODLUM), GetGameVersionName(GAME_10US_COMPACT),
+					GetGameVersionName(GAME_10EU), GetGameVersionName(GAME_11US), GetGameVersionName(GAME_11EU), GetGameVersionName(GAME_STEAM),
+					GetGameVersionName(GAME_STEAM_LV));
 				IfSampExist = false;
 			}
 		}

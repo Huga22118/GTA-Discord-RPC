@@ -11,16 +11,19 @@ Memory Addresses taken from [GTAMods](https://gtamods.com/wiki/Category:Memory_A
 
 # Version
 - GTA III 1.0
-- GTA San Andreas 1.0 Hoodlum
-- GTA San Andreas 1.0 Compact
+- GTA San Andreas 1.0 US Hoodlum
+- GTA San Andreas 1.0 US Compact
+- GTA San Andreas 1.0 EU 
+- GTA San Andreas 1.01 US
+- GTA San Andreas 1.01 EU
+- GTA San Andreas Steam R2
+- GTA San Andreas Steam R2-LV
 - GTA Vice City 1.0
 
 # Screenshots
 ![iii](https://github.com/Huga22118/GTA-Discord-RPC/blob/main/iii.png)
 
-![sa_hoodlum](https://github.com/Huga22118/GTA-Discord-RPC/blob/main/sa_hoodlum.png)
-
-![sa_compact](https://github.com/Huga22118/GTA-Discord-RPC/blob/main/sa_compact.png)
+![sa](https://github.com/Huga22118/GTA-Discord-RPC/blob/main/sa.png)
 
 ![vc](https://github.com/Huga22118/GTA-Discord-RPC/blob/main/vc.png)
 
